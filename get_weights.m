@@ -2,10 +2,10 @@
 clear
 close all
 
-fics_to_process = 1:100; %Which fics to process 
-num_neighbors = 20; %How many neighbors to save
+fics_to_process = [8601:10000]; %Which fics to process 
+num_neighbors = 200; %How many neighbors to save
 fics_between_saves = 200; %How often to save
-fname = 'weight_matrix30k';
+fname = 'weight_matrix30k_200NN';
 
 %Load info 
 Sinfo = load('feature_vecs30k_info','IDs','user_weights','rows_per_file');
@@ -16,8 +16,8 @@ num_files = num_fics/rows_per_file;
 clear Sinfo
 
 % Load weight data if it exists
-if exist('weight_matrix30k.mat','file')
-    Sdata = load('weight_matrix30k','indexes','weights');
+if exist([fname '.mat'],'file')
+    Sdata = load(fname,'indexes','weights');
 else
     Sdata = struct;
     Sdata.indexes = zeros(num_fics,num_neighbors);
@@ -87,15 +87,42 @@ for iFic = fics_to_process
     fprintf('Finished fic %d\n',iFic)
     toc
     
-    % Save file
-    if mod(count,fics_between_saves)==0        
+    % Save file early. Reload old file and add the newly calculated rows
+    if exist([fname '.mat'],'file')
+
+        %Add new rows to old data
+        Sold = load(fname,'indexes','weights');
+        new_rows = Sdata.indexes(:,1)>0;
+        Sold.indexes(new_rows,:) = Sdata.indexes(new_rows,:);
+        Sold.weights(new_rows,:) = Sdata.weights(new_rows,:);
+
+        %Save
+        save(fname,'-struct','Sold');
+        fprintf('Temp save at row %d: %s\n',iFic,fname);
+    else
         save(fname,'-struct','Sdata');
-        fprintf('Temp save: %s\n',fname);
+        fprintf('Temp save at row %d: %s\n',iFic,fname);
     end
         
     
 end
 
-save(fname,'-struct','Sdata');
-fprintf('Final save: %s. Finished rows %d to %d\n',fname, ...
-    fics_to_process(1),fics_to_process(end));
+%Final save: Reload file and add the newly calculated rows
+if exist([fname '.mat'],'file')
+    
+    %Add new rows to old data
+    Sold = load(fname,'indexes','weights');
+    new_rows = Sdata.indexes(:,1)>0;
+    Sold.indexes(new_rows,:) = Sdata.indexes(new_rows,:);
+    Sold.weights(new_rows,:) = Sdata.weights(new_rows,:);
+    
+    %Save
+    save(fname,'-struct','Sold');
+    fprintf('Final save: %s. Finished rows %d to %d\n',fname, ...
+        fics_to_process(1),fics_to_process(end));
+else
+    save(fname,'-struct','Sdata');
+    fprintf('Final save: %s. Finished rows %d to %d\n',fname, ...
+        fics_to_process(1),fics_to_process(end));
+end
+
