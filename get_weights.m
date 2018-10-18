@@ -2,7 +2,7 @@
 clear
 close all
 
-fics_to_process = [8601:10000]; %Which fics to process 
+fics_to_process = [20001:21000]; %Which fics to process 
 num_neighbors = 200; %How many neighbors to save
 fics_between_saves = 200; %How often to save
 fname = 'weight_matrix30k_200NN';
@@ -88,20 +88,23 @@ for iFic = fics_to_process
     toc
     
     % Save file early. Reload old file and add the newly calculated rows
-    if exist([fname '.mat'],'file')
+    if mod(count,fics_between_saves)==0
+        temp_fname = [fname '_' num2str(iFic)];
+        if exist([fname '.mat'],'file')
 
-        %Add new rows to old data
-        Sold = load(fname,'indexes','weights');
-        new_rows = Sdata.indexes(:,1)>0;
-        Sold.indexes(new_rows,:) = Sdata.indexes(new_rows,:);
-        Sold.weights(new_rows,:) = Sdata.weights(new_rows,:);
+            %Add new rows to old data
+            Sold = load(fname,'indexes','weights');
+            new_rows = Sdata.indexes(:,1)>0;
+            Sold.indexes(new_rows,:) = Sdata.indexes(new_rows,:);
+            Sold.weights(new_rows,:) = Sdata.weights(new_rows,:);
 
-        %Save
-        save(fname,'-struct','Sold');
-        fprintf('Temp save at row %d: %s\n',iFic,fname);
-    else
-        save(fname,'-struct','Sdata');
-        fprintf('Temp save at row %d: %s\n',iFic,fname);
+            %Save
+            save(temp_fname,'-struct','Sold');
+            fprintf('Temp save at row %d: %s\n',iFic,fname);
+        else
+            save(temp_fname,'-struct','Sdata');
+            fprintf('Temp save at row %d: %s\n',iFic,fname);
+        end
     end
         
     
