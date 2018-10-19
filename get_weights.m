@@ -2,13 +2,14 @@
 clear
 close all
 
-fics_to_process = [20001:21000]; %Which fics to process 
-num_neighbors = 200; %How many neighbors to save
-fics_between_saves = 200; %How often to save
-fname = 'weight_matrix30k_200NN';
+fics_to_process = [1:100]; %Which fics to process 
+num_neighbors = 500; %How many neighbors to save
+fics_between_saves = 500; %How often to save
+fname = 'weight_matrix32k_500NN';
+feat_fname = 'feature_vecs32k';
 
 %Load info 
-Sinfo = load('feature_vecs30k_info','IDs','user_weights','rows_per_file');
+Sinfo = load([feat_fname '_info'],'IDs','user_weights','rows_per_file');
 user_weights = Sinfo.user_weights;
 rows_per_file = Sinfo.rows_per_file;
 num_fics = length(Sinfo.IDs);
@@ -42,14 +43,14 @@ for iFic = fics_to_process
     
     %Handle edge cases
     if row_ind==0
-        row_ind=2000;
+        row_ind=Sinfo.rows_per_file;
     end
     if file_ind==num_files
         file_ind = file_ind-1;
     end
     
     % Get users that like current fic
-    load(['Feature vector files\feature_vecs30k_' num2str(file_ind+1) '.mat'],'L');
+    load(['Feature vector files\' feat_fname '_' num2str(file_ind+1) '.mat'],'L');
     current_fic = L(row_ind,:);
     
     %Skip if no users like fic
@@ -63,7 +64,7 @@ for iFic = fics_to_process
     for iL = 1:num_files
         
         %Load file
-        load(['Feature vector files\feature_vecs30k_' num2str(iL) '.mat'],'L');
+        load(['Feature vector files\' feat_fname '_' num2str(iL) '.mat'],'L');
 
         %Rows of temp_weights to fill
         ind = (iL-1)*rows_per_file + (1:rows_per_file);

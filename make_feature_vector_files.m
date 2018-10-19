@@ -3,11 +3,11 @@
 clear
 close all
 
-fname = 'feature_vecs30k';
+fname = 'feature_vecs32k';
 load([fname '_info.mat'],'IDs','titles');
 
 % # of rows determines how many files there will ultimately be
-rows_per_file = 2000;
+rows_per_file = 4000;
 
 % Constants to be calculate
 num_files = ceil(length(IDs)/rows_per_file);

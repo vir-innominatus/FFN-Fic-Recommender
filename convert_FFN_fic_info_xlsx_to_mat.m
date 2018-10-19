@@ -2,7 +2,7 @@ clear
 close all
 
 % Read in excel file as table
-T = readtable('FFN_fic_info_31MAR2017.xlsx');
+T = readtable('FFN_fic_info_18OCT2018.xlsx');
 
 % Create variables for each column. This just allows us to save time later
 % by only loading the variables we want from this huge file.
@@ -18,19 +18,19 @@ genres = T.Genre;
 characters = T.Characters;
 
 % Numbers
-IDs = T.ID;
+IDs = T.IDs;
 chapters = T.Chapters;
 words = T.Words;
 reviews = T.Reviews;
 favs = T.Favorites;
 follows = T.Follows;
 complete = T.Complete;
-updated = T.Updated;
-published = T.Published;
+updated = T.Updated_UTC_;
+published = T.Published_UTC_;
 
 
 %Save summaries separately to keep file under 100 MB
-save FFN_fic_info_31MAR2017_summaries summaries
+save FFN_fic_info_18OCT2018_summaries summaries
 clear summaries T
-save FFN_fic_info_31MAR2017 
+save FFN_fic_info_18OCT2018 
 
